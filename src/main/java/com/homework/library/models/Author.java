@@ -1,12 +1,12 @@
-package com.homework.library;
+package com.homework.library.models;
 
 public class Author {
-    // Variables privadas
-    private int authorId; // Autoincrementada
+    private int authorId;
     private String name;
     private String email;
-    private Book authorBook; // Relación uno a uno con la clase Libro
-    private static int nextId = 1; // Para autoincrementar el ID
+    private Book authorBook;
+    private static int nextId = 1;
+
 
     public Author(String name, String email, Book authorBook) {
         this.authorId = nextId++;
