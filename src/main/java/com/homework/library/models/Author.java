@@ -1,45 +1,42 @@
 package com.homework.library.models;
 
+import jakarta.persistence.*;
+
+@Entity
 public class Author {
-    private int authorId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long authorId;  // Use Long for IDs (more scalable)
     private String name;
     private String email;
-    private Book authorBook;
-    private static int nextId = 1;
 
+    @ManyToOne
+    @JoinColumn(name = "book_isbn", referencedColumnName = "isbn") // Corrected column name
+    private Book book;  // Changed name to 'book' for clarity
 
-    public Author(String name, String email, Book authorBook) {
-        this.authorId = nextId++;
+    public Author(String joshuaBloch, String mail) {
+    }
+
+    public Author(String name, String email, Book book) {
         this.name = name;
         this.email = email;
-        this.authorBook = authorBook;
+        this.book = book;
     }
 
-    public int getAuthorId() {
-        return authorId;
-    }
+    // Getters and Setters
+    public Long getAuthorId() { return authorId; }
+    public void setAuthorId(Long authorId) { this.authorId = authorId; }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
 
-    public String getEmail() {
-        return email;
-    }
+    public Book getBook() { return book; }
+    public void setBook(Book book) { this.book = book; }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Book getAuthorBook() {
-        return authorBook;
-    }
-
-    public void setAuthorBook(Book authorBook) {
-        this.authorBook = authorBook;
+    public Object getAuthorBook() {
+        return null;
     }
 }
