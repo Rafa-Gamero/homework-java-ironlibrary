@@ -3,43 +3,45 @@ package com.homework.library;
 import com.homework.library.models.Book;
 import com.homework.library.models.Author;
 import com.homework.library.models.Student;
-import com.homework.library.models.Issue; // Importamos la entidad Issue
 import com.homework.library.repositories.BookRepository;
 import com.homework.library.repositories.AuthorRepository;
 import com.homework.library.repositories.StudentRepository;
-import com.homework.library.repositories.IssueRepository; // Importamos el repositorio IssueRepository
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDate; // Importamos LocalDate para las fechas
+import org.springframework.transaction.annotation.Transactional; // Importante para la transacción
+
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+
 @SpringBootApplication
-@ComponentScan(basePackages = "com.homework.library")
+@ComponentScan(basePackages = "com.homework.library") // Asegura que Spring escanee tus componentes
 public class LibraryApplication implements CommandLineRunner {
+
 	private final BookRepository bookRepository;
 	private final AuthorRepository authorRepository;
 	private final StudentRepository studentRepository;
-	private final IssueRepository issueRepository; // Agregamos el IssueRepository
 	private final Scanner scanner = new Scanner(System.in);
+
 	@Autowired
-	public LibraryApplication(BookRepository bookRepository, AuthorRepository authorRepository, StudentRepository studentRepository, IssueRepository issueRepository) {
+	public LibraryApplication(BookRepository bookRepository, AuthorRepository authorRepository, StudentRepository studentRepository) {
 		this.bookRepository = bookRepository;
 		this.authorRepository = authorRepository;
 		this.studentRepository = studentRepository;
-		this.issueRepository = issueRepository; // Inicializamos el IssueRepository
 	}
+
 	public static void main(String[] args) {
 		SpringApplication.run(LibraryApplication.class, args);
 	}
+
 	@Override
 	public void run(String... args) {
 		displayMenu();
 	}
+
 	public void displayMenu() {
 		boolean exit = false;
 		while (!exit) {
@@ -51,10 +53,13 @@ public class LibraryApplication implements CommandLineRunner {
 			System.out.println("5. Listar todos los libros con autor");
 			System.out.println("6. Prestar libro a estudiante");
 			System.out.println("7. Listar libros por USN");
+
 			System.out.println("8. Salir");
 			System.out.print("Ingrese su opción: ");
+
 			int choice = scanner.nextInt();
-			scanner.nextLine();
+			scanner.nextLine(); // Consume la nueva línea
+
 			switch (choice) {
 				case 1:
 					addBook();
@@ -87,6 +92,7 @@ public class LibraryApplication implements CommandLineRunner {
 			}
 		}
 	}
+
 	private void addBook() {
 		System.out.println("\n--- Añadir un Libro ---");
 		System.out.print("Ingrese ISBN: ");
@@ -97,17 +103,23 @@ public class LibraryApplication implements CommandLineRunner {
 		String category = scanner.nextLine();
 		System.out.print("Ingrese Cantidad: ");
 		int quantity = scanner.nextInt();
-		scanner.nextLine();
+		scanner.nextLine(); // Consume la nueva línea
+
 		Book book = new Book(isbn, title, category, quantity);
 		bookRepository.save(book);
+
 		System.out.print("Ingrese Nombre del Autor: ");
 		String authorName = scanner.nextLine();
 		System.out.print("Ingrese Email del Autor: ");
 		String authorEmail = scanner.nextLine();
+
 		Author author = new Author(authorName, authorEmail, book);
 		authorRepository.save(author);
+
 		System.out.println("Libro añadido exitosamente!");
+
 	}
+
 	private void searchBookByTitle() {
 		System.out.println("\n--- Buscar Libro por Título ---");
 		System.out.print("Ingrese título a buscar: ");
@@ -117,6 +129,7 @@ public class LibraryApplication implements CommandLineRunner {
 				.toList();
 		displayBooks(books);
 	}
+
 	private void searchBookByCategory() {
 		System.out.println("\n--- Buscar Libro por Categoría ---");
 		System.out.print("Ingrese categoría a buscar: ");
@@ -126,6 +139,7 @@ public class LibraryApplication implements CommandLineRunner {
 				.toList();
 		displayBooks(books);
 	}
+
 	private void searchBookByAuthor() {
 		System.out.println("\n--- Buscar Libro por Autor ---");
 		System.out.print("Ingrese nombre del autor a buscar: ");
@@ -140,6 +154,7 @@ public class LibraryApplication implements CommandLineRunner {
 				.toList();
 		displayBooks(books);
 	}
+
 	private void listAllBooksWithAuthors() {
 		System.out.println("\n--- Listar Todos los Libros con Autores ---");
 		List<Book> books = bookRepository.findAll();
@@ -149,7 +164,7 @@ public class LibraryApplication implements CommandLineRunner {
 			System.out.println("ISBN\tTítulo\tCategoría\tCantidad\tNombre del Autor\tEmail del Autor");
 			for (Book book : books) {
 				Optional<Author> author = authorRepository.findAll().stream()
-						.filter(a -> a.getAuthorBook() != null && a.getAuthorBook().equals(book))
+						.filter(a -> a.getBook() != null && a.getBook().getIsbn().equals(book.getIsbn()))
 						.findFirst();
 				if (author.isPresent()) {
 					System.out.println(book.getIsbn() + "\t" + book.getTitle() + "\t" + book.getCategory() + "\t" +
@@ -161,6 +176,8 @@ public class LibraryApplication implements CommandLineRunner {
 			}
 		}
 	}
+
+
 	private void issueBookToStudent() {
 		System.out.println("\n--- Prestar Libro a Estudiante ---");
 		System.out.print("Ingrese USN del Estudiante: ");
@@ -169,49 +186,38 @@ public class LibraryApplication implements CommandLineRunner {
 		String studentName = scanner.nextLine();
 		System.out.print("Ingrese ISBN del Libro a Prestar: ");
 		String isbn = scanner.nextLine();
-		System.out.print("Ingrese Fecha de Préstamo (YYYY-MM-DD): ");
-		LocalDate issueDate = LocalDate.parse(scanner.nextLine());
-		System.out.print("Ingrese Fecha de Devolución (YYYY-MM-DD): ");
-		LocalDate returnDate = LocalDate.parse(scanner.nextLine());
-		Optional<Book> book = bookRepository.findById(isbn);
-		Optional<Student> student = studentRepository.findById(usn);
+		System.out.print("Ingrese Fecha de Préstamo: ");
+		String issueDate = scanner.nextLine();
+		System.out.print("Ingrese Fecha de Devolución: ");
+		String returnDate = scanner.nextLine();
+
+		Optional<Book> book = bookRepository.findById(String.valueOf(Long.valueOf(isbn)));
+		Optional<Student> student = studentRepository.findById(String.valueOf(Long.valueOf(usn)));
+
 		if (book.isPresent() && book.get().getQuantity() > 0) {
-			// Aseguramos que el estudiante exista o lo creamos si no existe
-			if (!student.isPresent()) {
-				Student newStudent = new Student(usn, studentName);
-				studentRepository.save(newStudent);
-				student = Optional.of(newStudent); // Actualizamos la referencia student
-			}
-			Issue issue = new Issue(issueDate, returnDate, student.get(), book.get());
-			issueRepository.save(issue);
+			Student student1 = new Student(usn, studentName);
+			studentRepository.save(student1);
 			book.get().setQuantity(book.get().getQuantity() - 1);
 			bookRepository.save(book.get());
 			System.out.println("Libro prestado exitosamente!");
 		} else {
-			System.out.println("El libro no está disponible.");
+			System.out.println("El libro no está disponible o el estudiante no existe.");
 		}
 	}
+
 	private void listBooksByUsn() {
 		System.out.println("\n--- Listar Libros por USN ---");
 		System.out.print("Ingrese USN del Estudiante: ");
 		String usn = scanner.nextLine();
-		Optional<Student> student = studentRepository.findById(usn);
+		Optional<Student> student = studentRepository.findById(String.valueOf(Long.valueOf(usn)));
 		if (student.isPresent()) {
-			System.out.println("USN: " + student.get().getUsn());
-			System.out.println("Nombre: " + student.get().getName());
-			System.out.println("Libros prestados:");
-			List<Issue> issues = issueRepository.findByStudent_Usn(usn); // Buscamos los prestamos por USN
-			if (issues.isEmpty()) {
-				System.out.println("No hay libros prestados a este estudiante.");
-			} else {
-				for (Issue issue : issues) {
-					System.out.println("- " + issue.getBook().getTitle() + " (Devolución: " + issue.getReturnDate() + ")");
-				}
-			}
+			System.out.println("Funcionalidad no implementada aún");
 		} else {
 			System.out.println("Estudiante no encontrado");
 		}
 	}
+
+
 
 	private void displayBooks(List<Book> books) {
 		if (books.isEmpty()) {
