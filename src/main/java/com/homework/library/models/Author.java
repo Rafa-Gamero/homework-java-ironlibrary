@@ -14,8 +14,8 @@ public class Author {
     @JoinColumn(name = "book_isbn", referencedColumnName = "isbn") // Corrected column name
     private Book book;  // Changed name to 'book' for clarity
 
-    public Author(String joshuaBloch, String mail) {
-    }
+    public Author(){}
+
 
     public Author(String name, String email, Book book) {
         this.name = name;

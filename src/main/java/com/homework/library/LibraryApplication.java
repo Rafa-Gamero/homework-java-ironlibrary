@@ -53,8 +53,8 @@ public class LibraryApplication implements CommandLineRunner {
 			System.out.println("5. Listar todos los libros con autor");
 			System.out.println("6. Prestar libro a estudiante");
 			System.out.println("7. Listar libros por USN");
-			System.out.println("8. Borrar un libro");
-			System.out.println("9. Salir");
+
+			System.out.println("8. Salir");
 			System.out.print("Ingrese su opción: ");
 
 			int choice = scanner.nextInt();
@@ -82,10 +82,8 @@ public class LibraryApplication implements CommandLineRunner {
 				case 7:
 					listBooksByUsn();
 					break;
+
 				case 8:
-					deleteBook();
-					break;
-				case 9:
 					exit = true;
 					System.out.println("Saliendo...");
 					break;
@@ -166,7 +164,7 @@ public class LibraryApplication implements CommandLineRunner {
 			System.out.println("ISBN\tTítulo\tCategoría\tCantidad\tNombre del Autor\tEmail del Autor");
 			for (Book book : books) {
 				Optional<Author> author = authorRepository.findAll().stream()
-						.filter(a -> a.getAuthorBook() != null && a.getAuthorBook().equals(book))
+						.filter(a -> a.getBook() != null && a.getBook().getIsbn().equals(book.getIsbn()))
 						.findFirst();
 				if (author.isPresent()) {
 					System.out.println(book.getIsbn() + "\t" + book.getTitle() + "\t" + book.getCategory() + "\t" +
@@ -178,6 +176,7 @@ public class LibraryApplication implements CommandLineRunner {
 			}
 		}
 	}
+
 
 	private void issueBookToStudent() {
 		System.out.println("\n--- Prestar Libro a Estudiante ---");
@@ -218,25 +217,7 @@ public class LibraryApplication implements CommandLineRunner {
 		}
 	}
 
-    @Transactional
-	private void deleteBook() {
-		System.out.println("\n--- Borrar un Libro ---");
-		System.out.print("Ingrese el ISBN del libro a borrar: ");
-		String isbn = scanner.nextLine();
 
-		try {
-			// Primero, buscamos el libro para obtener su ID (si es necesario)
-			Optional<Book> bookToDelete = bookRepository.findById(String.valueOf(Long.valueOf(isbn)));
-			if (bookToDelete.isPresent()) {
-				bookRepository.delete(bookToDelete.get()); // Borramos el libro
-				System.out.println("Libro borrado exitosamente!");
-			} else {
-				System.out.println("No se encontró ningún libro con ese ISBN.");
-			}
-		} catch (Exception e) {
-			System.out.println("Error al borrar el libro: " + e.getMessage());
-		}
-	}
 
 	private void displayBooks(List<Book> books) {
 		if (books.isEmpty()) {
