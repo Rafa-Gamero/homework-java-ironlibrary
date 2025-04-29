@@ -23,7 +23,6 @@ El sistema de gestión de biblioteca incluye las siguientes funcionalidades:
 * Listar todos los libros con autor
 * Prestar libro a estudiante
 * Listar libros por USN (Número de Identificación de Estudiante)
-* Borrar un libro
 * Salir del sistema
 
 ## Tecnologías Utilizadas
