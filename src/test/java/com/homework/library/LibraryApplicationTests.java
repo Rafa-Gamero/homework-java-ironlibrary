@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 public class LibraryApplicationTests {
-
+    // con mock creamos objetos simulados para los repositorios siguientes, y evitamos acceso real a la bbdd.
     @Mock
     private BookRepository bookRepository;
 
@@ -27,7 +27,7 @@ public class LibraryApplicationTests {
 
     @InjectMocks
     private LibraryApplication libraryApp;  // La clase que estamos probando
-
+    // inyectamos automaticamente los mocks en una instancia de la aplicacion, la clase que estamos probando.
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this); // Inicializa los mocks de Mockito
@@ -36,13 +36,9 @@ public class LibraryApplicationTests {
     @Test
     void testDisplayBooks_NoBooks() {
         when(bookRepository.findAll()).thenReturn(new ArrayList<>());
-        //  Dado que displayBooks es privado, es posible que debas usar la reflexión
-        //  o refactorizar tu código para que sea más fácil de probar.
-        //  Por ejemplo, extrae la lógica en una clase separada.
-        //  Este ejemplo muestra el concepto, pero deberás adaptarlo.
+        // simula el caso en que no hay libros en la base de datos;
         //  libraryApp.displayBooks(bookRepository.findAll());
-        //  La forma en que afirmas la salida depende de cómo captures la salida de la consola
-        //  (lo cual está más allá del alcance de este ejemplo rápido).
+
         System.out.println("Prueba: Escenario sin libros");
     }
 
@@ -52,7 +48,7 @@ public class LibraryApplicationTests {
         books.add(new Book("111", "Título 1", "Categoría 1", 1));
         books.add(new Book("222", "Título 2", "Categoría 2", 2));
         when(bookRepository.findAll()).thenReturn(books);
-        //  La misma nota sobre la prueba de la salida de la consola que arriba.
+        // simula un caso donde hay dos libros dispobibles;
         //  libraryApp.displayBooks(bookRepository.findAll());
         System.out.println("Prueba: Escenario con libros");
     }
